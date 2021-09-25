@@ -442,7 +442,7 @@ def main(config):
             print(str(diff_swimmers[i][4]) + ": " + str(out[i][1][-1]))
     
         plt.legend()
-        plt.title(r"$x$ Displacement of the Purcell Swimmer over Time")
+        plt.title(r"$x$ Displacement of Different Swimmers over Time")
         plt.xlabel("Time (s)")
         plt.ylabel(r"$x$ Displacement (μm)")
         plt.show()
@@ -455,7 +455,7 @@ def main(config):
             names.append(diff_swimmers[i][4])
         print(finishes)
         plt.plot(range(number_of_swimmers), finishes, marker='o')
-        plt.title("Displacements of Different Purcell Swimmers")
+        plt.title("Displacements of Different Swimmers")
         plt.xlabel("Swimmer")
         plt.ylabel(r"$x$ Displacement (μm)")
         plt.xticks(range(number_of_swimmers), names, rotation = 0)
@@ -473,7 +473,7 @@ def main(config):
             else:
                 plt.plot(time, out[i][4], label = diff_swimmers[i][4])
     
-        plt.title(r"$y$ Displacement of the Purcell Swimmer over Time")
+        plt.title(r"$y$ Displacement of Different Swimmers over Time")
         plt.xlabel("Time (s)")
         plt.ylabel(r"$y$ Displacement (μm)")
         plt.show()
