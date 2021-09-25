@@ -84,7 +84,7 @@ class Swimmer():
             col_change[0] += 1/(number_of_shots + 2)
             col_change[2] += -1/(number_of_shots + 2)
             
-        plt.title("Placement of " + self.name[-9:] + " over Time")
+        plt.title("Placement of " + self.name + " over Time")
         plt.xlabel(r'$x$ (μm)')
         plt.ylabel(r"$y$ (μm)")
         plt.gca().set_aspect("equal")
@@ -128,7 +128,7 @@ class Swimmer():
         for i, alpha in enumerate(alphas):
             plt.plot(self.xs[int(lower*rate):int(upper*rate)], alpha[int(lower*rate):int(upper*rate)], label = r"$\alpha$" + str(i + 2).translate(SUB))
         plt.legend()
-        plt.title("Alpha Values over Time for the " + self.name[-9:])
+        plt.title("Alpha Values over Time for the " + self.name)
         plt.xlabel("Time (s)")
         plt.ylabel(r"$\alpha$ (rad)")
         plt.show()
