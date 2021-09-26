@@ -137,8 +137,8 @@ class Swimmer():
         alphas = np.rollaxis(self.alphas, 1)
         number_of_alphas = len(alphas)
         for i in range(number_of_alphas - 1):
-            plt.plot(-alphas[i], alphas[i + 1])
-            plt.xlabel(r"-$\alpha$" + str(i + 2).translate(SUB) + " (rad)", fontsize = 15)
+            plt.plot(alphas[i], alphas[i + 1])
+            plt.xlabel(r"$\alpha$" + str(i + 2).translate(SUB) + " (rad)", fontsize = 15)
             plt.ylabel(r"$\alpha$" + str(i + 3).translate(SUB) + " (rad)", fontsize = 15)
             plt.gca().set_aspect("equal")
             plt.show()
