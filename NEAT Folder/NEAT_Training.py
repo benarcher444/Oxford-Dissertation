@@ -19,7 +19,6 @@ import numpy as np
 from numpy import sin, cos
 import random
 import pygame
-random.seed(42)
 
 '''
 Here we can change some of the hyperparameters for the NEAT algorithm. 
@@ -38,7 +37,7 @@ mutate_power = False
 mutate_rate = False
 num_hidden = 0
 compatibility_disjoint_coefficient = 0.9
-compatibility_weight_coefficient = 0.9
+compatibility_weight_coefficient = 0.7
 
 '''
 Variables for the microswimmers themselves. Make sure you set them to train the right type of swimmer.
