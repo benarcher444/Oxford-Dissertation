@@ -49,10 +49,10 @@ diff_swimmers = [["Purcell", 3, 20, 1.5, "Purcell Swimmer", "Red"]
                 ,["Test", 3, 20, 1.5, "Test: Wave", "BLue"]
                 ,["Test2", 3, 20, 1.5, "Test: Scallop", "Green"]
                 ,["Learning", "3 - Link 𝛿 = 1.5//winner.dat", 20, 1.5, "3-Link", "Black"]
-                ,["Learning", "4 - Link//winner.dat", 20, 1.5, "3-Link", "Black"]
-                ,["Learning", "5 - Link//winner.dat", 20, 1.5, "3-Link", "Black"]
-                ,["Learning", "6 - Link//winner.dat", 20, 1.5, "3-Link", "Black"]
-                ,["Learning", "10 - Link//winner.dat", 20, 1.5, "3-Link", "Black"]
+                ,["Learning", "4 - Link//winner.dat", 20, 1.5, "4-Link", "Black"]
+                ,["Learning", "5 - Link//winner.dat", 20, 1.5, "5-Link", "Black"]
+                ,["Learning", "6 - Link//winner.dat", 20, 1.5, "6-Link", "Black"]
+                ,["Learning", "10 - Link//winner.dat", 20, 1.5, "10-Link", "Black"]
                 ]
 
 '''
@@ -64,8 +64,8 @@ Runtime: The number of seconds to run the simulation for
 '''
 
 speed = 1
-rate = 100
-runtime = 1
+rate = 1000
+runtime = 30
 
 '''
 Below you can choose which different plots you want from a simulation.
@@ -77,7 +77,7 @@ distances = True
 y_displacement = True
 displacements_2D = True
 placements = True
-number_of_shots = 1
+number_of_shots = 50
 alphas = True
 alphas_2D = True
 
@@ -91,7 +91,7 @@ white = (255, 255, 255)
 red   = (200, 0, 0)
 blue = (0, 0, 200)
 
-plot_colours1 = True
+plot_colours1 = False
 plot_colours2 = False
 colors = ["Red", "Blue", "Green", "Purple", "Yellow"]
 
