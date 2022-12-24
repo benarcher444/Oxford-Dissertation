@@ -82,4 +82,3 @@ class Test2_Swimmer:
             self.alphadot = np.zeros(self.N - 1) + 0.5
         else:
             self.alphadot = np.zeros(self.N - 1) - 1
-

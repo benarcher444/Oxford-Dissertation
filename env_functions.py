@@ -3,9 +3,8 @@ import os
 import numpy as np
 from numpy import sin, cos
 import pickle
-import shutil
 
-from run_config import eta, xi, black, height, speed, compiled_dir, training_dir
+from run_config import eta, xi, black, height, speed, compiled_dir
 
 
 def calculate_coords(x1, y1, theta, swimmer):

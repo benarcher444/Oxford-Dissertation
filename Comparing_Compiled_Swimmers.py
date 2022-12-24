@@ -4,8 +4,8 @@ Created on Wed Sep  1 16:03:37 2021
 
 @author: Ben Archer
 
-This program visualises the swimmer over 30 seconds. Place the swimmers you would like to simulate
-in the folders array. You can then alter the rate and speed of the visualisation.
+This program visualises the swimmer over 30 seconds. Place the folders or compiled swimmers
+you would like to simulate in the folders array. You can then alter the rate and speed of the visualisation.
 """
 
 import pickle
@@ -34,7 +34,7 @@ draw = True
 
 
 class Compiled_Swimmer:
-    def __init__(self, data, rate, number, total_number):
+    def __init__(self, data, number, total_number):
         self.x_dist = data['x_dist']
         self.y_dist = data['y_dist']
         self.thetas = data['thetas']
@@ -74,7 +74,7 @@ def run():
 
         data = pickle.load(open(file_path, 'rb'))
 
-        swimmers.append(Compiled_Swimmer(data, rate, i, total_count))
+        swimmers.append(Compiled_Swimmer(data, i, total_count))
         labels.append({'label': data['label']})
 
     if plot:

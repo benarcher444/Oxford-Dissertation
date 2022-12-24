@@ -191,8 +191,8 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
 
     for cg in genome.connections.values():
         if cg.enabled or show_disabled:
-            input, output = cg.key
-            a = node_names.get(input, str(input))
+            this_input, output = cg.key
+            a = node_names.get(this_input, str(this_input))
             b = node_names.get(output, str(output))
             style = 'solid' if cg.enabled else 'dotted'
             color = 'green' if cg.weight > 0 else 'red'
