@@ -1,8 +1,11 @@
 import pygame
+import os
 import numpy as np
 from numpy import sin, cos
+import pickle
+import shutil
 
-from run_config import eta, xi, black, rate, height, speed
+from run_config import eta, xi, black, height, speed, compiled_dir, training_dir
 
 
 def calculate_coords(x1, y1, theta, swimmer):
@@ -47,6 +50,14 @@ def draw_swimmer(swimmer, screen):
             pygame.draw.circle(screen, swimmer.dot_colour, (int(swimmer.coords[0, i]), int(swimmer.coords[1, i])), 2)
 
 
+def draw_compiled_swimmer(swimmer, screen, tick):
+    for i in range(swimmer.N):
+        pygame.draw.line(screen, black, (swimmer.coords_list[tick][0, i], swimmer.coords_list[tick][1, i]),
+                         (swimmer.coords_list[tick][0, i + 1], swimmer.coords_list[tick][1, i + 1]))
+        if i > 0:
+            pygame.draw.circle(screen, swimmer.dot_colour, (int(swimmer.coords_list[tick][0, i]), int(swimmer.coords_list[tick][1, i])), 2)
+
+
 def gradient(x1, y1, theta0, swimmer):
     theta = np.append([theta0], swimmer.theta[1:])
     calculate_coords(x1, y1, theta, swimmer)
@@ -59,7 +70,7 @@ def gradient(x1, y1, theta0, swimmer):
 
 
 def RK4(swimmer):
-    h = 1 / rate
+    h = 1 / swimmer.rate
     xk1, yk1, tk1 = gradient(swimmer.x1, swimmer.y1, swimmer.theta[0], swimmer)
     xk2, yk2, tk2 = gradient(swimmer.x1 + h * xk1 / 2, swimmer.y1 + h * yk1 / 2, swimmer.theta[0] + h * tk1 / 2, swimmer)
     xk3, yk3, tk3 = gradient(swimmer.x1 + h * xk2 / 2, swimmer.y1 + h * yk2 / 2, swimmer.theta[0] + h * tk2 / 2, swimmer)
@@ -72,7 +83,7 @@ def RK4(swimmer):
 # fixes the swimmer if it tries to overextend and sets the lambda values
 def set_rates(swimmer, out):
     swimmer.alphadot = np.array(2 * out - 1)
-    alpha = swimmer.alpha + swimmer.alphadot / rate
+    alpha = swimmer.alpha + swimmer.alphadot / swimmer.rate
     swimmer.last_side = [-side if abs(alpha_i) >= swimmer.max_angle else side for side, alpha_i in zip(swimmer.last_side, alpha)]
     swimmer.alphadot = np.array([0 if abs(alpha_i) >= swimmer.max_angle else alphadot_i for alpha_i, alphadot_i in zip(alpha, swimmer.alphadot)])
 
@@ -103,8 +114,9 @@ def calculate_fitness(swimmer):
 
 
 # sets up initial conditions
-def set_up(swimmer, N, length, delta, number, total_number):
+def set_up(swimmer, N, length, delta, rate, number, total_number):
     swimmer.N = N
+    swimmer.rate = rate
     swimmer.L = np.array([length for _ in range(N)])
     swimmer.delta = delta
     swimmer.max_angle = (delta / speed) / 2
@@ -128,27 +140,26 @@ def set_up(swimmer, N, length, delta, number, total_number):
 
     swimmer.x_mid_start, swimmer.y_mid_start = calculate_mid_dists(swimmer)
 
-    swimmer.dist = [0]
+    swimmer.x_dist = [0]
     swimmer.y_dist = [0]
     swimmer.alphas = np.array([swimmer.alpha])
-    swimmer.positions = [swimmer.coords.copy()]
+    swimmer.thetas = np.array([swimmer.theta])
+    swimmer.coords_list = [swimmer.coords.copy()]
 
 
 def report(swimmer):
     x_dist, y_dist = calculate_mid_dists(swimmer)
-    swimmer.dist.append(x_dist - swimmer.x_mid_start)
+    swimmer.x_dist.append(x_dist - swimmer.x_mid_start)
     swimmer.y_dist.append(y_dist - swimmer.y_mid_start)
     swimmer.alphas = np.vstack((swimmer.alphas, swimmer.alpha))
-
-
-def report_position(swimmer):
+    swimmer.thetas = np.vstack((swimmer.thetas, swimmer.theta))
     calculate_coords(swimmer.x1, swimmer.y1, swimmer.theta, swimmer)
-    swimmer.positions.append(swimmer.coords.copy())
+    swimmer.coords_list.append(swimmer.coords.copy())
 
 
 def calculate_position(swimmer):
     RK4(swimmer)
-    swimmer.alpha = swimmer.alpha + swimmer.alphadot / rate
+    swimmer.alpha = swimmer.alpha + swimmer.alphadot / swimmer.rate
     calculate_thetas(swimmer)
 
 
@@ -156,8 +167,60 @@ def calculate_thetas(swimmer):
     swimmer.theta[1:] = np.cumsum(swimmer.alpha) + swimmer.theta[0]
 
 
-def iterate(swimmer, screen, tick_count):
+def iterate_and_report(swimmer, screen, tick_count):
     draw_swimmer(swimmer, screen)
     swimmer.calculate_alphadot(tick_count)
     calculate_position(swimmer)
     report(swimmer)
+
+
+def iterate(swimmer, screen, tick_count):
+    draw_swimmer(swimmer, screen)
+    swimmer.calculate_alphadot(tick_count)
+    calculate_position(swimmer)
+
+
+def set_up_config(config, N):
+    config.genome_config.num_inputs = 3 * N - 2
+    config.genome_config.num_outputs = N - 1
+    config.genome_config.input_keys = [-i for i in range(1, config.genome_config.num_inputs + 1)]
+    config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
+    return config
+
+
+def calculate_N(genome):
+    nodes = list(genome.nodes.keys())
+    missing = next((a for (a, b) in zip(nodes, nodes[1:]) if a + 1 != b), None)
+    return nodes[missing] + 2 if missing is not None else nodes[-1] + 2
+
+
+def save_data(swimmer, swimmer_config, rate, runtime):
+    folder = os.path.join(compiled_dir, swimmer_config['compile'])
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+
+    path = os.path.join(folder, f'compiled-rate-{rate}-runtime-{runtime}.dat')
+    print(f"Compiling to {path}")
+
+    y_adjust(swimmer)
+
+    data = {'x_dist': swimmer.x_dist, 'y_dist': swimmer.y_dist, 'thetas': swimmer.thetas, 'label': swimmer_config['label'],
+            'alphas': swimmer.alphas, 'coords_list': swimmer.coords_list, 'dot_colour': swimmer.dot_colour}
+
+    pickle.dump(data, open(path, 'wb'))
+
+
+def y_adjust(swimmer):
+    y_start = swimmer.coords_list[0][1, 0]
+
+    for i, coords in enumerate(swimmer.coords_list):
+        coords[1, :] = coords[1, :] - y_start
+
+
+def compile_swimmers(swimmers, swimmer_creation, rate, runtime):
+    if not os.path.exists(compiled_dir):
+        os.mkdir(compiled_dir)
+
+    for swimmer, swimmer_config in zip(swimmers, swimmer_creation):
+        if swimmer_config.get('compile', None):
+            save_data(swimmer, swimmer_config, rate, runtime)
