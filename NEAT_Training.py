@@ -14,20 +14,21 @@ import neat
 import visualize
 import pickle
 import pygame
-# import random
+import random
 
-from run_config import rate, white, height, width, neat_config, training_path, checkpoint_dir
+from run_config import white, height, width, neat_config, training_dir, checkpoint_dir
 from swimmer_classes import Learning_Swimmer
 from env_functions import calculate_fitness, iterate
 
 os.environ["PATH"] += os.pathsep + "C:\\Program Files\\Graphviz\\bin"
 
-# random.seed(1)
+random.seed(1)
 
 run_name = 'Test'
 pop_size = 10
 number_of_generations = 2
 runtime = 15
+rate = 100
 load_in = False
 new_fitness = False
 mutate_power = False
@@ -52,7 +53,7 @@ def eval_genomes(genomes, config):
 
     i = 0
     for genome_id, genome in genomes:
-        swimmers.append(Learning_Swimmer(N, length, delta, i, pop_size, genome, config))
+        swimmers.append(Learning_Swimmer(N, length, delta, rate, i, pop_size, genome, config))
         i += 1
 
     tick_count = 0
@@ -87,10 +88,10 @@ def eval_genomes(genomes, config):
 
 
 def run():
-    if not os.path.exists(training_path):
-        os.mkdir(training_path)
+    if not os.path.exists(training_dir):
+        os.mkdir(training_dir)
 
-    dir_path = os.path.join(training_path, run_name)
+    dir_path = os.path.join(training_dir, run_name)
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
 
@@ -169,4 +170,3 @@ def run():
 
 if __name__ == '__main__':
     run()
-
