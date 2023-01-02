@@ -1,0 +1,6 @@
+pygame
+numpy
+matplotlib
+neat-python
+graphviz
+neat
