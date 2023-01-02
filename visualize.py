@@ -13,7 +13,7 @@ import graphviz
 import matplotlib.pyplot as plt
 import numpy as np
 
-from run_config import space_between_positions
+from run_config import space_between_positions, number_of_overlays
 SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -205,6 +205,9 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
 
 
 def plot_x_dist(swimmers, swimmer_creation, total_ticks):
+    """
+    Plots the recorded x_distance over time for each swimmer passed to the function
+    """
     for swimmer_config, swimmer in zip(swimmer_creation, swimmers):
         time_space = np.linspace(0, total_ticks - 1, total_ticks) / swimmer.rate
         print(swimmer_config['label'])
@@ -219,6 +222,9 @@ def plot_x_dist(swimmers, swimmer_creation, total_ticks):
 
 
 def plot_y_dist(swimmers, swimmer_creation, total_ticks):
+    """
+    Plots the recorded y_distance over time for each swimmer passed to the function
+    """
     for swimmer_config, swimmer in zip(swimmer_creation, swimmers):
         time_space = np.linspace(0, total_ticks - 1, total_ticks) / swimmer.rate
         plt.plot(time_space, swimmer.y_dist, label=swimmer_config['label'])
@@ -232,6 +238,9 @@ def plot_y_dist(swimmers, swimmer_creation, total_ticks):
 
 
 def plot_final_distances(swimmers, swimmer_creation):
+    """
+    Plots the recorded final distance over time for each swimmer passed to the function
+    """
     plt.plot(range(len(swimmers)), [max(swimmer.x_dist) for swimmer in swimmers], marker='o')
     plt.title("Displacements of Different Swimmers")
     plt.xlabel("Swimmer")
@@ -241,6 +250,9 @@ def plot_final_distances(swimmers, swimmer_creation):
 
 
 def plot_2d_displacements(swimmers, swimmer_creation):
+    """
+    Plots a track of the x and y coordinates for each swimmer passed to the function
+    """
     for swimmer, swimmer_config in zip(swimmers, swimmer_creation):
         plt.plot(swimmer.x_dist, swimmer.y_dist, label=swimmer_config['label'])
     plt.xlabel(r"$x$ Displacement (μm)")
@@ -249,6 +261,9 @@ def plot_2d_displacements(swimmers, swimmer_creation):
 
 
 def plot_2d_alphas(swimmers, swimmer_creation):
+    """
+    Plots each alpha against the next in 2d for each swimmer passed to the function
+    """
     for swimmer, swimmer_config in zip(swimmers, swimmer_creation):
         alphas = np.rollaxis(swimmer.alphas, 1)
         number_of_alphas = len(alphas)
@@ -261,6 +276,9 @@ def plot_2d_alphas(swimmers, swimmer_creation):
 
 
 def plot_3d_alphas(swimmers, swimmer_creation):
+    """
+    Plots each alpha against the next two in 3d for each swimmer passed to the function where the swimmer has 3 or more alphas.
+    """
     for swimmer, swimmer_config in zip(swimmers, swimmer_creation):
         alphas = np.rollaxis(swimmer.alphas, 1)
         number_of_alphas = len(alphas)
@@ -277,6 +295,9 @@ def plot_3d_alphas(swimmers, swimmer_creation):
 
 
 def plot_all_alphas(swimmers, swimmer_creation, total_ticks):
+    """
+    Plots each alpha over time for each swimmer passed to the function
+    """
     for swimmer, swimmer_config in zip(swimmers, swimmer_creation):
         time_space = np.linspace(0, total_ticks - 1, total_ticks) / swimmer.rate
         alphas = np.rollaxis(swimmer.alphas, 1)
@@ -289,7 +310,12 @@ def plot_all_alphas(swimmers, swimmer_creation, total_ticks):
         plt.show()
 
 
-def plot_positions(swimmers, number_of_overlays):
+def plot_positions(swimmers):
+    """
+    Plots the coordinates of each swimmer in 2d for each swimmer passed to the function
+    It takes a snapshot of its coords at a point in time and plots those.
+    The number of overlays defines the number of snapshots wanted. These are plotted over each other.
+    """
     for swimmer in swimmers:
         col_change = [0, 0, 1]
         values = [int(i/number_of_overlays*len(swimmer.coords_list)) for i in range(number_of_overlays + 1)]
@@ -307,7 +333,12 @@ def plot_positions(swimmers, number_of_overlays):
         plt.show()
 
 
-def plot_positions_spaced(swimmers, number_of_overlays):
+def plot_positions_spaced(swimmers):
+    """
+    Plots the coordinates of each swimmer in 2d for each swimmer passed to the function
+    It takes a snapshot of its coords at a point in time and plots those.
+    The number of overlays defines the number of snapshots wanted. These are plotted spaced apart by the space_between_positions.
+    """
     for swimmer in swimmers:
         col_change = [0, 0, 1]
         values = [int(i / number_of_overlays * len(swimmer.coords_list)) for i in range(number_of_overlays + 1)]
