@@ -4,18 +4,28 @@ Created on Wed Sep  1 16:03:37 2021
 
 @author: Ben Archer
 
-This program visualises the swimmer over 30 seconds. Place the folders or compiled swimmers
-you would like to simulate in the folders array. You can then alter the rate and speed of the visualisation.
+This program simulates and plots previously compiled swimmers.
+
+Once a swimmer has been compiled, put the name of the folder where the data file resides in the folders array.
+Ensure that the rate and runtime match the rate and runtime on the data file.
+
+Edit the playspeed (int) to speed up the visulisation of the swimmer.
+
+Set Plot and Draw to True to see plots of the swimmer and the swimmer itself move respectively.
 """
 
+# Import required modules
 import pickle
 import pygame
 import sys
 import time
 import os
 
+# Import configuration variables from run_config
 from run_config import width, height, compiled_dir, white
-from env_functions import draw_compiled_swimmer
+# Import drawing function from env_functions
+from helper_functions import draw_compiled_swimmer
+# Import plotting functios from visualize
 from visualize import plot_x_dist, plot_y_dist, plot_final_distances, plot_2d_displacements, plot_2d_alphas,\
                       plot_all_alphas, plot_positions, plot_positions_spaced, plot_3d_alphas
 
@@ -29,10 +39,10 @@ runtime = 30
 play_speed = 2
 
 plot = True
-number_of_overlays = 10
 draw = True
 
 
+# A simple class to store the data from each swimmer
 class Compiled_Swimmer:
     def __init__(self, data, number, total_number):
         self.x_dist = data['x_dist']
@@ -46,24 +56,18 @@ class Compiled_Swimmer:
 
         y_displacement = height * (number + 1)/(total_number + 1)
 
+        # Ensures that when visulised the swimmers are not on top of each other.
         for i, coords in enumerate(self.coords_list):
             coords[1, :] = coords[1, :] + y_displacement
 
 
 def run():
-    done = False
-
-    screen = pygame.display.set_mode((width, height))
-    clock = pygame.time.Clock()
-
-    pygame.display.set_caption("Micro Swimmers")
-
-    # Creates swimmers
+    # Creates swimmers and their respective labels. Formats to work with visualisation functions.
     swimmers = list()
     labels = list()
     total_count = len(folders)
     for i, folder in enumerate(folders):
-
+        # Checks that folder and file can be found
         file_name = f"compiled-rate-{rate}-runtime-{runtime}.dat"
         folder_path = os.path.join(compiled_dir, folder)
         if not os.path.exists(folder_path):
@@ -78,6 +82,7 @@ def run():
         labels.append({'label': data['label']})
 
     if plot:
+        # Plots all of the swimmers.
         total_ticks = rate * runtime + 2
         plot_x_dist(swimmers, labels, total_ticks)
         plot_y_dist(swimmers, labels, total_ticks)
@@ -86,12 +91,20 @@ def run():
         plot_2d_alphas(swimmers, labels)
         plot_3d_alphas(swimmers, labels)
         plot_all_alphas(swimmers, labels, total_ticks)
-        plot_positions(swimmers, number_of_overlays)
-        plot_positions_spaced(swimmers, number_of_overlays)
+        plot_positions(swimmers)
+        plot_positions_spaced(swimmers)
 
     if draw:
+        done = False
+        # Sets up pygame window.
+        screen = pygame.display.set_mode((width, height))
+        clock = pygame.time.Clock()
+
+        pygame.display.set_caption("Micro Swimmers")
+
         tick_count = 0
         while not done:
+            # Fills screen white and checks for exit
             screen.fill(white)
 
             for event in pygame.event.get():
@@ -99,11 +112,13 @@ def run():
                     pygame.quit()
                     sys.exit()
 
+            # Draws the compiled swimmer to the screen
             for swimmer in swimmers:
                 draw_compiled_swimmer(swimmer, screen, tick_count*play_speed)
 
             pygame.display.flip()
 
+            # Outputs counters to show progress
             tick_count += 1
             if tick_count * play_speed % (runtime * rate / 10) == 0:
                 print("Percentage Done:", int(tick_count * play_speed / (runtime * rate) * 100))
